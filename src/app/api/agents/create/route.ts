@@ -1,7 +1,7 @@
 // src/app/api/agents/create/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcryptjs';
+import { randomBytes, scryptSync } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -33,12 +33,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🔑 Hash password
-    const hashedPassword = await hash(password, 12);
+    // 🔑 Hash password (using Node's built-in crypto to avoid an external bcryptjs dependency)
+    // Format: "<salt>:<derivedKeyHex>"
+    const salt = randomBytes(16).toString('hex');
+    const derivedKey = scryptSync(password, salt, 64).toString('hex');
+    const hashedPassword = `${salt}:${derivedKey}`;
 
     // 🧾 Create agent (no account yet)
     const agent = await prisma.agent.create({
-       {
+      data: {
         name,
         email,
         phone,
@@ -105,10 +108,11 @@ export async function POST(request: Request) {
       { status: 201 }
     );
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Agent creation error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error.';
     return NextResponse.json(
-      { error: error.message || 'Internal server error.' },
+      { error: errorMessage },
       { status: 500 }
     );
   } finally {
