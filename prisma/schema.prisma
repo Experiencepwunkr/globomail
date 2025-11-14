@@ -1,0 +1,28 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  name            String
+  phone           String
+  password        String    // will be hashed
+  walletBalance   Float     @default(0.0)
+  accountNumber   String?   // e.g., "0123456789"
+  bankName        String?   // e.g., "Wema Bank"
+  accountName     String?   // e.g., "GLOBO-AGENT-123"
+  paystackCode    String?   // Paystack customer code
+  isApproved      Boolean   @default(false)
+  canWithdraw     Boolean   @default(false) // ← your requirement: restrict withdrawals
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("agents")
+}
