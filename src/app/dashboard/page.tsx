@@ -5,40 +5,88 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { getAgent, clearAgent } from '@/lib/auth';
+import { getAgent } from '@/lib/auth';
 
 const services = [
-  { id: 'nin', name: 'NIN Verification', icon: '/icons/nin.svg', path: '/services/nin' },
-  { id: 'nin-with-phone', name: 'NIN With Phone', icon: '/icons/phone.svg', path: '/services/nin-with-phone' },
-  { id: 'cac', name: 'CAC Services', icon: '/icons/cac.svg', path: '/services/cac' },
-  { id: 'bvn-verification', name: 'BVN Verification', icon: '/icons/bvn.svg', path: '/services/bvn-verify' },
-  { id: 'bvn-retrieval', name: 'BVN Retrieval', icon: '/icons/bvn.svg', path: '/services/bvn-retrieval' },
-  { id: 'ipe-clearance', name: 'IPE Clearance (Instant)', icon: '/icons/ipe.svg', path: '/services/ipe-clearance' },
-  { id: 'validation', name: 'Validation (Instant)', icon: '/icons/valid.svg', path: '/services/validation' },
-  { id: 'personalization', name: 'Personalization', icon: '/icons/pers.svg', path: '/services/personalization' },
-  { id: 'self-service-unlink', name: 'Self Service Unlink', icon: '/icons/unlink.svg', path: '/services/self-service-unlink' },
-  { id: 'modifications', name: 'Modifications', icon: '/icons/mod.svg', path: '/services/modifications' },
-  { id: 'birth-attestation', name: 'Birth Attestation', icon: '/icons/birth.svg', path: '/services/birth-attestation' },
-  { id: 'tin', name: 'TIN Certificate', icon: '/icons/tin.svg', path: '/services/tin' },
-  { id: 'newspaper-pub', name: 'Newspaper Pub.', icon: '/icons/news.svg', path: '/services/newspaper-pub' },
+  {
+    id: 'nin',
+    name: 'NIN Verification',
+    icon: '/icons/nin.svg',
+    path: '/services/nin',
+  },
+  {
+    id: 'nin-with-phone',
+    name: 'NIN With Phone',
+    icon: '/icons/phone.svg',
+    path: '/services/nin-with-phone',
+  },
+  {
+    id: 'cac',
+    name: 'CAC Services',
+    icon: '/icons/cac.svg',
+    path: '/services/cac',
+  },
+  {
+    id: 'bvn-verification',
+    name: 'BVN Verification',
+    icon: '/icons/bvn.svg',
+    path: '/services/bvn-verify',
+  },
+  {
+    id: 'bvn-retrieval',
+    name: 'BVN Retrieval',
+    icon: '/icons/bvn.svg',
+    path: '/services/bvn-retrieval',
+  },
+  {
+    id: 'ipe-clearance',
+    name: 'IPE Clearance (Instant)',
+    icon: '/icons/ipe.svg',
+    path: '/services/ipe-clearance',
+  },
+  {
+    id: 'validation',
+    name: 'Validation (Instant)',
+    icon: '/icons/valid.svg',
+    path: '/services/validation',
+  },
+  {
+    id: 'personalization',
+    name: 'Personalization',
+    icon: '/icons/pers.svg',
+    path: '/services/personalization',
+  },
+  {
+    id: 'self-service-unlink',
+    name: 'Self Service Unlink',
+    icon: '/icons/unlink.svg',
+    path: '/services/self-service-unlink',
+  },
+  {
+    id: 'modifications',
+    name: 'Modifications',
+    icon: '/icons/mod.svg',
+    path: '/services/modifications',
+  },
+  {
+    id: 'birth-attestation',
+    name: 'Birth Attestation',
+    icon: '/icons/birth.svg',
+    path: '/services/birth-attestation',
+  },
+  {
+    id: 'tin',
+    name: 'TIN Certificate',
+    icon: '/icons/tin.svg',
+    path: '/services/tin',
+  },
+  {
+    id: 'newspaper-pub',
+    name: 'Newspaper Pub.',
+    icon: '/icons/news.svg',
+    path: '/services/newspaper-pub',
+  },
 ];
-
-// Fallback icons (in case SVGs missing)
-const placeholderIcons: Record<string, string> = {
-  nin: '👤',
-  'nin-with-phone': '📱+👤',
-  cac: '🏢',
-  'bvn-verification': '🆔',
-  'bvn-retrieval': '🔍',
-  'ipe-clearance': '👮',
-  validation: '✅',
-  personalization: '🎨',
-  'self-service-unlink': '🔗',
-  modifications: '✏️',
-  'birth-attestation': '👶',
-  tin: '🧾',
-  'newspaper-pub': '📰',
-};
 
 export default function DashboardPage() {
   const [agent, setAgent] = useState<any>(null);
@@ -79,7 +127,8 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleLogout = () => {
-    clearAgent();
+    // Clear session (for now, just redirect)
+    localStorage.removeItem('agent');
     router.push('/login');
   };
 
@@ -110,7 +159,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6">
+    <div className="min-h-screen bg-gray-900 text-white p-4 md:p-6">
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
@@ -202,13 +251,39 @@ export default function DashboardPage() {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
                     const span = document.createElement('span');
-                    span.textContent = placeholderIcons[service.id] || '❓';
+                    span.textContent = service.id === 'nin' ? '👤' :
+                                     service.id === 'nin-with-phone' ? '📱+👤' :
+                                     service.id === 'cac' ? '🏢' :
+                                     service.id === 'bvn-verification' ? '🆔' :
+                                     service.id === 'bvn-retrieval' ? '🔍' :
+                                     service.id === 'ipe-clearance' ? '👮' :
+                                     service.id === 'validation' ? '✅' :
+                                     service.id === 'personalization' ? '🎨' :
+                                     service.id === 'self-service-unlink' ? '🔗' :
+                                     service.id === 'modifications' ? '✏️' :
+                                     service.id === 'birth-attestation' ? '👶' :
+                                     service.id === 'tin' ? '🧾' :
+                                     service.id === 'newspaper-pub' ? '📰' : '❓';
                     span.className = 'text-2xl';
                     target.parentNode?.appendChild(span);
                   }}
                 />
               ) : (
-                <span className="text-2xl mb-2">{placeholderIcons[service.id] || '❓'}</span>
+                <span className="text-2xl mb-2">
+                  {service.id === 'nin' ? '👤' :
+                   service.id === 'nin-with-phone' ? '📱+👤' :
+                   service.id === 'cac' ? '🏢' :
+                   service.id === 'bvn-verification' ? '🆔' :
+                   service.id === 'bvn-retrieval' ? '🔍' :
+                   service.id === 'ipe-clearance' ? '👮' :
+                   service.id === 'validation' ? '✅' :
+                   service.id === 'personalization' ? '🎨' :
+                   service.id === 'self-service-unlink' ? '🔗' :
+                   service.id === 'modifications' ? '✏️' :
+                   service.id === 'birth-attestation' ? '👶' :
+                   service.id === 'tin' ? '🧾' :
+                   service.id === 'newspaper-pub' ? '📰' : '❓'}
+                </span>
               )}
 
               {/* Name */}
