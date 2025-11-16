@@ -8,11 +8,12 @@ export async function POST(req: NextRequest) {
     const tx = await prisma.transaction.findUnique({ where: { reference: paymentReference } });
     if (!tx || tx.status !== 'success') return NextResponse.json({ error: 'Payment invalid' }, { status: 403 });
     const u = await prisma.transaction.update({ where: { id: tx.id },
-      data: { meta { nin, phone }, status: 'pending' },
+      data: { meta: { nin, phone }, status: 'pending' },
     });
     return NextResponse.json({ success: true, requestId: u.id });
   } catch (e) { return NextResponse.json({ error: 'Server error' }, { status: 500 });
-  } finally { await prisma.();
+  } finally { await prisma.$disconnect();
   }
 }
+
 
