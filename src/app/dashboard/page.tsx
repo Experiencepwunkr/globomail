@@ -7,8 +7,38 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function DashboardPage() {
-  const [agent, setAgent] = useState<any>(null);
-  const [requests, setRequests] = useState<any[]>([]);
+  type Agent = {
+    id: string;
+    email: string;
+    name: string;
+    phone?: string;
+    password?: string;
+    walletBalance?: number;
+    accountNumber?: string | null;
+    bankName?: string | null;
+    accountName?: string | null;
+    paystackCode?: string | null;
+    isApproved?: boolean;
+    canWithdraw?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+
+  type AgentRequest = {
+    id: string;
+    serviceType: string;
+    status: 'pending' | 'processing' | 'completed' | 'failed' | string;
+    createdAt: string;
+    result?: {
+      message?: string;
+      [key: string]: unknown;
+    } | null;
+    // allow additional fields from API without using `any[]` for the container
+    [key: string]: unknown;
+  };
+
+  const [agent, setAgent] = useState<Agent | null>(null);
+  const [requests, setRequests] = useState<AgentRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
