@@ -29,6 +29,7 @@ export default function LoginPage() {
       const result = await res.json();
 
       if (res.ok && result.success) {
+        saveAgent(result.agent); // ← Save to localStorage
         // ✅ Login success → redirect to dashboard
         alert('Login successful!');
         router.push('/dashboard'); // or '/agents'
